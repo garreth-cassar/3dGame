@@ -13,12 +13,22 @@ public class Screen extends Render {
         super(width, height);
         Random randy = new Random();
         test = new Render(256, 256);
-        for(int i = 0; i < 256*256; i++){
+        for(int i = 0; i < 256 * 256; i++){
             test.pixels[i] = randy.nextInt();
         }
     }
 
     public void render(){
-        draw(test, 0, 0);
+        for(int i = 0; i < width * height; i++){
+            pixels[i] = 0;
+        }
+
+        int i;
+
+        for(i = 0; i < 25; i++) {
+            int anim = (int) (Math.sin((System.currentTimeMillis() + i * 10) % 2000.0 / 2000 * Math.PI * 2) * 200);
+            int anim2 = (int) (Math.cos((System.currentTimeMillis() + i * 10)% 2000.0 / 2000 * Math.PI * 2) * 200);
+            draw(test, (width - 256) / 2 + anim, (height - 256) / 2 + anim2);
+        }
     }
 }

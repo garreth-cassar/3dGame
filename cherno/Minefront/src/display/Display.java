@@ -7,18 +7,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferInt;
 
 /**
  * Created by User on 23/08/15.
  */
 public class Display extends Canvas implements Runnable {
-    public static final int HEIGHT = 600;
-    public static final int WIDTH = 800;
+    public static final int HEIGHT = 800;
+    public static final int WIDTH = 1080;
     public static final String TITLE = "MineFront pre Alpha 0.01";
 
-    private Render render;
+
 
     private Thread thread;
     private Screen screen;
@@ -73,11 +72,38 @@ public class Display extends Canvas implements Runnable {
 
     @Override
     public void run() {
+        int frames = 0;
+        double unprocessedSeconds = 0;
+        long previousTime = System.nanoTime();
+        double secondsPerTick = 1 / 60.0;
+        int tickCount = 0;
+        boolean ticked = false;
         while (running) {
-            tick();
-            render();
+            long currentTime = System.nanoTime();
+            long passedTime = currentTime - previousTime;
+            previousTime = currentTime;
+            unprocessedSeconds = passedTime / 1000000000.0;
+
+            while(unprocessedSeconds > secondsPerTick) {
+                tick();
+                unprocessedSeconds -= secondsPerTick;
+                ticked = true;
+                tickCount++;
+                if (tickCount % 60 == 0){
+                    System.out.println(frames + " FPS:");
+                    previousTime += 1000;
+                    frames = 0;
+                }
+                if(ticked) {
+                    render();
+                    frames++;
+                }
+                render();
+                frames++;
+            }
         }
     }
+
 
     private void render() {
         BufferStrategy bs = this.getBufferStrategy();
